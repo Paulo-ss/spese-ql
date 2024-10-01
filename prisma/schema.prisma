@@ -1,0 +1,102 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Bank {
+  NuBank
+  Inter
+  Itau
+  Bradesco
+}
+
+enum InvoiceStatus {
+  OPENED_CURRENT
+  OPENED_FUTURE
+  CLOSED
+  DELAYED
+  PAID
+}
+
+enum ExpenseType {
+  credit_card
+  debit
+}
+
+enum ExpenseStatus {
+  PENDING
+  PAID
+}
+
+enum ExpenseCategory {
+  NAO_INFORMADO
+  SAUDE
+  LAZER
+  ACADEMICO
+  DIVERSAO
+  COMIDA
+  CASA
+  ROUPAS
+  PETS
+  UBER
+  INVESTIMENTO
+  ACADEMIA
+}
+
+model credit_card {
+  id           Int            @id @default(autoincrement())
+  nickname     String
+  bank         Bank
+  limit        Decimal        @db.Decimal(10, 2)
+  closing_day  Int
+  due_day      Int
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+  invoice      invoice[]
+  subscription subscription[]
+  expense      expense[]
+}
+
+model invoice {
+  id             Int           @id @default(autoincrement())
+  current_price  Decimal       @db.Decimal(10, 2)
+  closing_date   DateTime      @db.Date
+  due_date       DateTime      @db.Date
+  status         InvoiceStatus
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  credit_card    credit_card   @relation(fields: [credit_card_id], references: [id])
+  credit_card_id Int
+  expense        expense[]
+}
+
+model subscription {
+  id             Int         @id @default(autoincrement())
+  name           String
+  price          Decimal     @db.Decimal(10, 2)
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  credit_card    credit_card @relation(fields: [credit_card_id], references: [id])
+  credit_card_id Int
+}
+
+model expense {
+  id                  Int             @id @default(autoincrement())
+  expense_type        ExpenseType
+  installments_number Int
+  name                String
+  price               Decimal         @db.Decimal(10, 2)
+  status              ExpenseStatus
+  category            ExpenseCategory
+  expense_date        DateTime
+  updated_at          DateTime        @updatedAt
+  credit_card         credit_card     @relation(fields: [credit_card_id], references: [id])
+  credit_card_id      Int
+  invoice             invoice         @relation(fields: [invoice_id], references: [id])
+  invoice_id          Int
+}

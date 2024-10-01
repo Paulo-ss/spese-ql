@@ -1,0 +1,13 @@
+services:
+  spese-ql:
+    build: .
+    command: npm run start:dev
+    restart: always
+    ports:
+      - 4000:4000
+    env_file:
+      - .env
+    volumes:
+      - .:/home/spese-ql
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
