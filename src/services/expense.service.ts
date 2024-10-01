@@ -172,7 +172,8 @@ export class ExpenseService {
         }
 
         if (
-          (month - today.getMonth() === 1 ||
+          ((month - today.getMonth() === 1 &&
+            today.getDate() >= creditCard.closing_day) ||
             (month === today.getMonth() &&
               today.getDate() < creditCard.closing_day)) &&
           year === today.getFullYear()
@@ -226,7 +227,10 @@ export class ExpenseService {
             }
 
             if (
-              month - today.getMonth() === 1 &&
+              ((month - today.getMonth() === 1 &&
+                today.getDate() >= creditCard.closing_day) ||
+                (month === today.getMonth() &&
+                  today.getDate() < creditCard.closing_day)) &&
               year === today.getFullYear()
             ) {
               invoiceStatus = InvoiceStatus.OPENED_CURRENT;
